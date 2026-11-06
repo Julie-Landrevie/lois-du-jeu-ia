@@ -1,0 +1,41 @@
+id,categorie,type,question,reponse_attendue,loi_attendue,a_verifier,valide
+q01,Durée,dans_le_document,"Combien de temps dure un match, hors prolongation ?",Deux périodes de 45 minutes chacune.,7,,oui
+q02,Durée,dans_le_document,Quelle est la durée maximale de la pause de la mi-temps ?,Elle ne doit pas dépasser 15 minutes.,7,,oui
+q03,Durée,dans_le_document,Combien de temps durent les prolongations ?,Deux périodes égales de 15 minutes maximum chacune.,7,,oui
+q04,Durée,dans_le_document,Qui décide de la durée du temps additionnel ?,L'arbitre.,7,,oui
+q05,Joueurs,dans_le_document,Combien de joueurs faut-il au minimum dans une équipe pour qu'un match commence ou se poursuive ?,Sept joueurs.,3,,oui
+q06,Joueurs,dans_le_document,Combien de remplacements une équipe peut-elle faire au maximum dans une compétition officielle de haut niveau ?,"Jusqu'à cinq remplacements, selon le règlement de la compétition, en trois occasions au maximum pendant le match (hors pause de la mi-temps).",3,Vérifier la formulation exacte des occasions de remplacement.,oui
+q07,Nouveauté 2026/27,dans_le_document,Combien de remplaçants peut-on utiliser au maximum lors d'un match amical entre équipes nationales A ?,Huit au maximum ; jusqu'à onze si les deux équipes en conviennent.,3,Nouveauté 2026/27 : vérifier dans le livret.,oui
+q08,Nouveauté 2026/27,dans_le_document,"En combien de temps un joueur remplacé doit-il quitter le terrain, et que se passe-t-il s'il dépasse ce délai ?","En 10 secondes ; sinon, son remplaçant ne peut entrer qu'une minute (temps de jeu continu) après la reprise, puis à la première interruption.",3,Nouveauté 2026/27 : vérifier le numéro de loi (3 probable).,oui
+q09,Terrain,dans_le_document,Quelles sont les dimensions des buts ?,"7,32 m entre les poteaux et 2,44 m entre le sol et la barre transversale.",1,,oui
+q10,Terrain,dans_le_document,À quelle distance de la ligne de but se trouve le point de penalty ?,11 m.,1,,oui
+q11,Terrain,dans_le_document,Quel est le rayon du cercle central ?,"9,15 m.",1,,oui
+q12,Ballon,dans_le_document,Quelle doit être la circonférence du ballon ?,Entre 68 et 70 cm.,2,,oui
+q13,Ballon,dans_le_document,Que se passe-t-il si le ballon devient défectueux pendant le jeu ?,Le jeu est arrêté et reprend par une balle à terre.,2,"Vérifier l'exception (penalty, tirs au but).",oui
+q14,Équipement,dans_le_document,Les protège-tibias sont-ils obligatoires ?,"Oui, ils font partie de l'équipement obligatoire.",4,,oui
+q15,Équipement,dans_le_document,Les gardiens doivent-ils porter des couleurs différentes de celles des autres joueurs ?,"Oui, des couleurs qui les distinguent des autres joueurs et des arbitres.",4,,oui
+q16,Arbitre,dans_le_document,L'arbitre peut-il revenir sur une décision ?,"Oui, tant que le jeu n'a pas repris (ou avant la fin de la période / du match).",5,,oui
+q17,Reprises,dans_le_document,Peut-on marquer directement sur le coup d'envoi ?,"Oui, directement contre l'équipe adverse.",8,,oui
+q18,But,dans_le_document,Quand un but est-il marqué ?,"Quand le ballon a entièrement franchi la ligne de but entre les poteaux et sous la barre transversale, sans infraction.",10,,oui
+q19,But,dans_le_document,Comment se déroulent les tirs au but ?,"Les équipes tirent en alternance, cinq tirs chacune ; en cas d'égalité, les tirs continuent un par un jusqu'à ce qu'une équipe ait marqué un but de plus que l'autre avec le même nombre de tirs.",10,,oui
+q20,Hors-jeu,dans_le_document,Un joueur peut-il être en position de hors-jeu dans sa propre moitié de terrain ?,Non.,11,,oui
+q21,Hors-jeu,dans_le_document,Peut-on être sanctionné pour hors-jeu en recevant directement le ballon sur une rentrée de touche ?,"Non : pas d'infraction de hors-jeu sur rentrée de touche, coup de pied de but ou corner reçu directement.",11,,oui
+q22,Hors-jeu,dans_le_document,Comment est sanctionnée une infraction de hors-jeu ?,Par un coup franc indirect à l'endroit de l'infraction.,11,,oui
+q23,Fautes,dans_le_document,Que se passe-t-il quand un joueur reçoit un deuxième avertissement dans le même match ?,Il est exclu.,12,,oui
+q24,Fautes,dans_le_document,Quelle est la sanction si le gardien prend à la main une passe délibérée du pied d'un coéquipier ?,Un coup franc indirect.,12,,oui
+q25,Fautes,dans_le_document,"Combien de temps le gardien peut-il garder le ballon en main, et quelle est la sanction s'il dépasse ce délai ?","8 secondes ; au-delà, un corner est accordé à l'équipe adverse.",12,Règle de 2025/26 : vérifier le décompte visuel.,oui
+q26,Fautes,dans_le_document,Un but marqué juste après que le ballon a touché accidentellement la main d'un attaquant est-il valable ?,"Non, un but marqué immédiatement après un contact accidentel du bras ou de la main de l'attaquant est refusé.",12,Vérifier la formulation exacte (« immédiatement après »).,oui
+q27,Coups francs,dans_le_document,Que se passe-t-il si un coup franc indirect entre directement dans le but adverse ?,Le but n'est pas accordé : coup de pied de but pour l'adversaire.,13,,oui
+q28,Coups francs,dans_le_document,À quelle distance les adversaires doivent-ils se placer lors d'un coup franc ?,"À au moins 9,15 m du ballon jusqu'à ce qu'il soit en jeu.",13,,oui
+q29,Coups francs,dans_le_document,"Lorsque la défense forme un mur d'au moins trois joueurs, à quelle distance les attaquants doivent-ils se tenir ?",À au moins 1 m du mur.,13,,oui
+q30,Penalty,dans_le_document,Où doit se placer le gardien au moment d'un penalty ?,"Sur sa ligne de but, entre les poteaux, face au tireur ; au moins une partie d'un pied doit toucher la ligne de but ou être à son niveau au moment du tir.",14,,oui
+q31,Touche,dans_le_document,Peut-on marquer directement sur une rentrée de touche ?,"Non ; si le ballon entre directement dans le but adverse, coup de pied de but.",15,,oui
+q32,Touche,dans_le_document,À quelle distance les adversaires doivent-ils se tenir lors d'une rentrée de touche ?,À au moins 2 m de l'endroit de la rentrée.,15,,oui
+q33,Nouveauté 2026/27,dans_le_document,Que peut faire l'arbitre si une équipe tarde à effectuer une rentrée de touche ?,"Lancer un décompte visuel de 5 secondes ; si la rentrée n'est pas effectuée à temps, elle est accordée à l'équipe adverse.",15,Nouveauté 2026/27 : vérifier le numéro de loi et la formulation.,oui
+q34,But,dans_le_document,Quand le ballon est-il en jeu sur un coup de pied de but ?,Dès qu'il est botté et bouge clairement (il n'a pas besoin de sortir de la surface).,16,,oui
+q35,Corner,dans_le_document,Peut-on marquer directement sur un corner ?,"Oui, directement contre l'équipe adverse.",17,,oui
+q36,Touche,dans_le_document,Comment doit être effectuée une rentrée de touche ?,"Face au terrain, une partie de chaque pied sur la ligne de touche ou à l'extérieur, à deux mains, ballon lancé de derrière et par-dessus la tête.",15,,oui
+q37,Hors document,hors_document,Combien de points rapporte une victoire en championnat ?,Hors des Lois du Jeu (règlement de chaque compétition) : l'assistant doit refuser.,,,oui
+q38,Hors document,hors_document,Qui a remporté la Coupe du monde féminine 2023 ?,Hors des Lois du Jeu : l'assistant doit refuser.,,,oui
+q39,Hors document,hors_document,Combien de joueurs compte une équipe de futsal sur le terrain ?,Le futsal a ses propres lois : l'assistant doit refuser.,,,oui
+q40,Hors document,hors_document,Quel est le salaire d'un arbitre de Ligue 1 ?,Hors des Lois du Jeu : l'assistant doit refuser.,,,oui
