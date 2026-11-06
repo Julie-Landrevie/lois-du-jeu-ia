@@ -1,0 +1,5 @@
+.env
+data/*.pdf
+data/extraits.jsonl
+__pycache__/
+*.pyc
