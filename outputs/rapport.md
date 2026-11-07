@@ -6,9 +6,9 @@ Modèle : `mistral / mistral-large-4` · 36 questions dans le document, 4 hors d
 
 | Indicateur | Avec RAG |
 |---|---|
-| Réponses exactes (questions dans le document) | 89 % |
+| Réponses exactes (questions dans le document) | 94 % |
 | Réponses partielles | 3 % |
-| Réponses fausses (erreurs, dont inventions) | 6 % |
+| Réponses fausses (erreurs, dont inventions) | 0 % |
 | Refus de répondre à tort | 3 % |
 | Réponses qui citent une loi | 97 % |
 | Réponses qui citent la bonne loi | 97 % |
@@ -16,14 +16,11 @@ Modèle : `mistral / mistral-large-4` · 36 questions dans le document, 4 hors d
 | Bonne loi parmi les passages retrouvés (rappel de la recherche) | 100 % |
 | Temps moyen par réponse | 8.8 s |
 
-Aucune réponse relue à la main pour l'instant (colonne « verdict_humain » vide).
+Accord entre le juge automatique et la relecture humaine : 0 % (0/2 réponses relues).
 
 ## Réponses fausses ou à vérifier
 
-| Question | Mode | Réponse | Verdict |
-|---|---|---|---|
-| q10 – À quelle distance de la ligne de but se trouve le point de penalty ? | Avec RAG | Le point de penalty se trouve à **11 m (12 yds)** de la ligne de but. Cette distance est mesurée entre le centre du point de penalty et la limite extérieure de la ligne de but. [Loi 1] | faux |
-| q30 – Où doit se placer le gardien au moment d'un penalty ? | Avec RAG | Le gardien de but doit rester sur sa ligne de but, face au tireur, entre les poteaux avant que le tir ne soit effectué [Loi 14]. Au moment du tir, il doit avoir au moins un pied sur ou derrière sa ligne (ou au même nivea | faux |
+Aucune.
 
 ## Lecture
 
