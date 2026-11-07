@@ -5,6 +5,16 @@ Un assistant de questions-réponses sur les **Lois du Jeu de football (IFAB, éd
 La question posée : **un modèle de langage répond-il mieux quand on lui fournit le texte officiel (RAG) que lorsqu'il répond de mémoire ?** Les Lois du Jeu sont un bon terrain de test : le texte fait foi, il change chaque année (les nouveautés 2026/27 ne sont pas forcément connues d'un modèle), et les erreurs se vérifient facilement.
 
 ## Ce que fait le projet
+
+```
+PDF officiel ──► 1. Préparation ──► extraits étiquetés par loi (data/extraits.jsonl)
+                    + contrôle qualité (les 17 lois sont-elles présentes ?)
+Question ──────► 2. Recherche BM25 ──► passages les plus pertinents (4 en v1, 6 en v2)
+                 3. Génération ──► réponse du modèle, qui doit citer [Loi N]
+40 questions ──► 4. Évaluation ──► chaque réponse sans document et avec RAG (v1, v2)
+                 5. Rapport ──► indicateurs comparés (outputs/rapport.md, outputs/comparaison.md)
+```
+
 | Étape | Fichier | Choix |
 |---|---|---|
 | Préparation des données | `rag/ingestion.py` | Découpage par loi (repérage des 17 titres), extraits de ~180 mots avec chevauchement de 40 mots, page conservée ; contrôle qualité par loi |
@@ -27,57 +37,46 @@ La question posée : **un modèle de langage répond-il mieux quand on lui fourn
 
 ## Le jeu de questions
 
-`data/questions.csv` : 40 questions, dont 36 dont la réponse est dans le livret (durée, joueurs, terrain, hors-jeu, fautes, coups francs, penalty, touche, corner, **trois nouveautés 2026/27**) et 4 hors document. Les réponses de référence ont été rédigées à partir des Lois du Jeu ; leur relecture ligne à ligne dans le livret officiel est en cours, en commençant par les 7 lignes signalées dans la colonne `a_verifier`.
+`data/questions.csv` : 40 questions, dont 36 dont la réponse est dans le livret (durée, joueurs, terrain, hors-jeu, fautes, coups francs, penalty, touche, corner, **trois nouveautés 2026/27**) et 4 hors document. Les réponses de référence ont été rédigées à partir des Lois du Jeu ; celles contestées pendant l'évaluation ont été vérifiées dans le livret (une corrigée, q30), et la relecture complète ligne à ligne est en cours.
 
-## Résultats — version 1 (5 novembre 2026)
+## Résultats (modèle `mistral-large-4`, température 0, 40 questions)
 
-Modèle : `mistral-large-4` (API Mistral), température 0. Recherche v1 : 4 passages, tout le livret. Verdicts d'exactitude donnés par le juge automatique (relecture humaine en cours).
+Les verdicts d'exactitude viennent d'un juge automatique, **puis d'une relecture humaine** des réponses notées fausses : chaque cas a été vérifié dans le livret officiel (colonne `verdict_humain` des fichiers de résultats). Tableau produit par `python3 main.py comparer`.
 
-| Indicateur | Sans document | Avec le livret (RAG v1) |
-|---|---|---|
-| Réponses exactes | 75 % | 78 % |
-| **Réponses fausses** | **22 %** (8 sur 36) | **3 %** (1 sur 36) |
-| Refus de répondre à tort | 3 % | 19 % (7 sur 36) |
-| Réponses qui citent la bonne loi | 92 % | 78 % |
-| Nouveautés 2026/27 bien traitées | 0 sur 3 | 3 sur 3 |
-| Refus justifiés (questions hors document) | 4 sur 4 | 4 sur 4 |
-| Bonne loi parmi les passages retrouvés | – | 83 % |
+| Indicateur | Sans document | RAG v1 (5/11) | RAG v2 (6/11) |
+|---|---|---|---|
+| Réponses exactes | 75 % | 81 % | **94 %** |
+| Réponses partielles | 0 % | 0 % | 3 % |
+| **Réponses fausses** | **22 %** (8 sur 36) | **0 %** | **0 %** |
+| Refus de répondre à tort | 3 % | 19 % | **3 %** |
+| Réponses qui citent la bonne loi | 92 % | 78 % | **97 %** |
+| Nouveautés 2026/27 bien traitées | 0 sur 3 | 3 sur 3 | 3 sur 3 |
+| Refus justifiés (questions hors document) | 4 sur 4 | 4 sur 4 | 4 sur 4 |
+| Bonne loi parmi les passages retrouvés | – | 83 % | **100 %** |
+| Temps moyen par réponse | 8,6 s | 10,3 s | 8,8 s |
 
-**Ce qu'on en retient**
+### 1. Sans le texte officiel, le modèle se trompe avec assurance
 
-1. **Avec le texte officiel, l'assistant ne se trompe presque plus** (22 % → 3 % de réponses fausses). Sans document, le modèle affirme avec assurance des règles fausses ou périmées : 6 secondes au lieu de 8 pour le gardien, corner au lieu de coup de pied de but, carton jaune au lieu du décompte de 5 secondes sur une rentrée de touche (nouveauté 2026/27).
-2. **Le prix à payer, ce sont des refus** : avec le livret, l'assistant préfère dire « je ne trouve pas » plutôt qu'inventer. Pour un assistant de référence, c'est le bon compromis : un refus se voit, une erreur affirmée avec assurance passe inaperçue.
-3. **L'évaluation localise le maillon faible** : 5 refus sur 7 viennent de la recherche (la bonne loi n'était pas dans les passages fournis), pas du modèle. Une cause identifiée : 40 % des extraits sont des pages hors des 17 lois (introduction, directives, protocole VAR) qui prennent la place des bons passages.
+22 % de réponses fausses, souvent sur des règles récentes ou précises : 6 secondes au lieu de 8 pour le gardien, corner au lieu de coup de pied de but, carton jaune au lieu du décompte de 5 secondes sur une rentrée de touche (nouveauté 2026/27). Il cite pourtant une loi dans 97 % des cas : **une source citée ne garantit pas une réponse juste.**
 
-## Version 2 (6 novembre 2026) : corriger le maillon faible
+### 2. Version 1 : aucune erreur, mais trop de refus
 
-Correctifs issus de l'analyse des erreurs de la v1 (`rag/versions.py`) : recherche limitée aux 17 lois (modifications 2026/27 comprises), 6 passages au lieu de 4, et plus de citation « Loi 0 » pour les pages hors des 17 lois.
+Avec le livret, l'assistant ne donne plus aucune réponse fausse, mais refuse à tort 19 % des questions. L'analyse des erreurs localise le maillon faible : **5 refus sur 7 viennent de la recherche** (la bonne loi n'était pas dans les passages fournis), pas du modèle. Cause identifiée : 40 % des extraits sont des pages hors des 17 lois (introduction, directives, protocole VAR) qui prennent la place des bons passages.
 
-**1. La recherche seule** (`tester-recherche`, sans appel au modèle) : la bonne loi est retrouvée pour **36 questions sur 36**, contre 30 en v1. Les 6 ratés de la v1 avaient tous des passages hors des 17 lois parmi les résultats.
+### 3. Version 2 : corriger la recherche suffit
+
+Correctifs (`rag/versions.py`) : recherche limitée aux 17 lois (modifications 2026/27 comprises), 6 passages au lieu de 4, plus de citation « Loi 0 ». Mesuré d'abord sans appel au modèle (`tester-recherche`) :
 
 | Périmètre | 4 passages | 6 passages | 8 passages |
 |---|---|---|---|
 | Tout le livret (v1) | 83 % | 94 % | 97 % |
 | 17 lois seulement | 97 % | **100 %** (v2) | 100 % |
 
-**2. L'évaluation complète** (`comparer`, même modèle, mêmes 40 questions, juge automatique) :
+Résultat sur l'évaluation complète : refus à tort **19 % → 3 %**, réponses exactes **81 % → 94 %**, toujours aucune réponse fausse.
 
-| Indicateur | Sans document | RAG v1 | RAG v2 |
-|---|---|---|---|
-| Réponses exactes | 75 % | 78 % | **89 %** |
-| Réponses partielles | 0 % | 0 % | 3 % |
-| Réponses fausses | 22 % | 3 % | 6 % |
-| Refus de répondre à tort | 3 % | 19 % | **3 %** |
-| Réponses qui citent la bonne loi | 92 % | 78 % | **97 %** |
-| Refus justifiés (hors document) | 100 % | 100 % | 100 % |
-| Bonne loi parmi les passages retrouvés | – | 83 % | **100 %** |
-| Temps moyen par réponse | 8,6 s | 10,3 s | 8,8 s |
+### 4. Le juge automatique ne suffit pas
 
-**Ce qu'on en retient**
-
-1. **Corriger la recherche suffit à faire disparaître presque tous les refus** (19 % → 3 %) : les réponses exactes passent de 78 % à 89 %, et la bonne loi est citée dans 97 % des cas.
-2. **Les réponses fausses restent rares** (6 %, soit 2 questions sur 36, contre 1 en v1) : sur 36 questions, cet écart d'une réponse ne permet pas de conclure, et ces deux cas sont en cours d'analyse (erreur du modèle ou du juge automatique).
-3. **La démarche** : mesurer, localiser le maillon faible (la recherche, pas le modèle), corriger, remesurer.
+Les trois réponses avec le livret notées « fausses » par le juge ont été relues dans le texte officiel : **aucune n'était fausse.** Pour la question du point de penalty (v1 et v2), le juge s'est trompé sur la façon dont la distance est mesurée ; pour la position du gardien sur un penalty, c'est **la réponse de référence qui était erronée** (elle oubliait « ou derrière sa ligne », Loi 14) et l'assistant citait correctement le livret. La référence a été corrigée dans `data/questions.csv`. Leçon pour tout assistant de ce type : un juge automatique permet de passer à l'échelle, mais les réponses qu'il conteste doivent être relues, et les références elles-mêmes vérifiées.
 
 ## Lancer le projet
 
@@ -101,7 +100,7 @@ Le PDF officiel n'est pas inclus dans ce dépôt (droits de l'IFAB) : chacun le 
 ## Limites
 
 - **40 questions** : assez pour comparer deux modes, trop peu pour des écarts fins entre modèles.
-- **Juge automatique** : un modèle qui note un modèle peut se tromper ; d'où la colonne de relecture humaine et l'indicateur d'accord juge / humain.
+- **Juge automatique** : un modèle qui note un modèle peut se tromper (3 verdicts « faux » sur 3 démentis à la relecture) ; seules les réponses contestées ont été relues, les réponses jugées exactes ne l'ont pas toutes été.
 - **Un seul modèle testé** (`mistral-large-4`) : les chiffres ne se transposent pas tels quels à un autre modèle.
 - **Recherche lexicale** : BM25 rate les reformulations (« gardien » / « portier ») ; une recherche par embeddings serait l'étape suivante.
 - **Découpage du PDF** : dépend de la mise en page ; le contrôle qualité signale une loi manquante ou trop courte.
