@@ -5,16 +5,6 @@ Un assistant de questions-réponses sur les **Lois du Jeu de football (IFAB, éd
 La question posée : **un modèle de langage répond-il mieux quand on lui fournit le texte officiel (RAG) que lorsqu'il répond de mémoire ?** Les Lois du Jeu sont un bon terrain de test : le texte fait foi, il change chaque année (les nouveautés 2026/27 ne sont pas forcément connues d'un modèle), et les erreurs se vérifient facilement.
 
 ## Ce que fait le projet
-
-```
-PDF officiel ──► 1. Préparation ──► extraits étiquetés par loi (data/extraits.jsonl)
-                    + contrôle qualité (les 17 lois sont-elles présentes ?)
-Question ──────► 2. Recherche BM25 ──► 4 passages les plus pertinents
-                 3. Génération ──► réponse du modèle, qui doit citer [Loi N]
-40 questions ──► 4. Évaluation ──► chaque réponse en deux modes (sans document / avec RAG)
-                 5. Rapport ──► indicateurs comparés (outputs/rapport.md)
-```
-
 | Étape | Fichier | Choix |
 |---|---|---|
 | Préparation des données | `rag/ingestion.py` | Découpage par loi (repérage des 17 titres), extraits de ~180 mots avec chevauchement de 40 mots, page conservée ; contrôle qualité par loi |
@@ -28,7 +18,7 @@ Question ──────► 2. Recherche BM25 ──► 4 passages les plus p
 
 | Indicateur | Ce qu'il mesure |
 |---|---|
-| Réponses exactes / partielles / fausses | Fond de la réponse comparé à une réponse de référence validée à la main |
+| Réponses exactes / partielles / fausses | Fond de la réponse comparé à une réponse de référence rédigée à partir du livret |
 | Refus de répondre à tort | L'assistant dit « je ne trouve pas » alors que la réponse est dans le livret |
 | Réponses qui citent une loi / la bonne loi | Traçabilité : peut-on vérifier la réponse ? |
 | Refus justifiés | Questions hors document (classement d'un championnat, futsal…) : l'assistant doit refuser plutôt qu'inventer |
@@ -59,9 +49,35 @@ Modèle : `mistral-large-4` (API Mistral), température 0. Recherche v1 : 4 pass
 2. **Le prix à payer, ce sont des refus** : avec le livret, l'assistant préfère dire « je ne trouve pas » plutôt qu'inventer. Pour un assistant de référence, c'est le bon compromis : un refus se voit, une erreur affirmée avec assurance passe inaperçue.
 3. **L'évaluation localise le maillon faible** : 5 refus sur 7 viennent de la recherche (la bonne loi n'était pas dans les passages fournis), pas du modèle. Une cause identifiée : 40 % des extraits sont des pages hors des 17 lois (introduction, directives, protocole VAR) qui prennent la place des bons passages.
 
-## Version 2 (en cours)
+## Version 2 (6 novembre 2026) : corriger le maillon faible
 
-Correctifs issus de l'analyse des erreurs de la v1 (`rag/versions.py`) : recherche limitée aux 17 lois (modifications 2026/27 comprises), 6 passages au lieu de 4, et plus de citation « Loi 0 » pour les pages hors des 17 lois. La commande `tester-recherche` mesure d'abord le gain sur la recherche seule, sans appel au modèle ; l'évaluation complète de la v2 est ensuite comparée à la v1 avec `comparer`.
+Correctifs issus de l'analyse des erreurs de la v1 (`rag/versions.py`) : recherche limitée aux 17 lois (modifications 2026/27 comprises), 6 passages au lieu de 4, et plus de citation « Loi 0 » pour les pages hors des 17 lois.
+
+**1. La recherche seule** (`tester-recherche`, sans appel au modèle) : la bonne loi est retrouvée pour **36 questions sur 36**, contre 30 en v1. Les 6 ratés de la v1 avaient tous des passages hors des 17 lois parmi les résultats.
+
+| Périmètre | 4 passages | 6 passages | 8 passages |
+|---|---|---|---|
+| Tout le livret (v1) | 83 % | 94 % | 97 % |
+| 17 lois seulement | 97 % | **100 %** (v2) | 100 % |
+
+**2. L'évaluation complète** (`comparer`, même modèle, mêmes 40 questions, juge automatique) :
+
+| Indicateur | Sans document | RAG v1 | RAG v2 |
+|---|---|---|---|
+| Réponses exactes | 75 % | 78 % | **89 %** |
+| Réponses partielles | 0 % | 0 % | 3 % |
+| Réponses fausses | 22 % | 3 % | 6 % |
+| Refus de répondre à tort | 3 % | 19 % | **3 %** |
+| Réponses qui citent la bonne loi | 92 % | 78 % | **97 %** |
+| Refus justifiés (hors document) | 100 % | 100 % | 100 % |
+| Bonne loi parmi les passages retrouvés | – | 83 % | **100 %** |
+| Temps moyen par réponse | 8,6 s | 10,3 s | 8,8 s |
+
+**Ce qu'on en retient**
+
+1. **Corriger la recherche suffit à faire disparaître presque tous les refus** (19 % → 3 %) : les réponses exactes passent de 78 % à 89 %, et la bonne loi est citée dans 97 % des cas.
+2. **Les réponses fausses restent rares** (6 %, soit 2 questions sur 36, contre 1 en v1) : sur 36 questions, cet écart d'une réponse ne permet pas de conclure, et ces deux cas sont en cours d'analyse (erreur du modèle ou du juge automatique).
+3. **La démarche** : mesurer, localiser le maillon faible (la recherche, pas le modèle), corriger, remesurer.
 
 ## Lancer le projet
 
